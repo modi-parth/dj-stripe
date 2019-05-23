@@ -330,7 +330,7 @@ class Charge(StripeModel):
 		)
 		return self.__class__.sync_from_stripe_data(charge_obj)
 
-	def capture(self):
+	def capture(self, amount=None):
 		"""
 		Capture the payment of an existing, uncaptured, charge.
 		This is the second half of the two-step payment flow, where first you
@@ -338,8 +338,11 @@ class Charge(StripeModel):
 
 		See https://stripe.com/docs/api#capture_charge
 		"""
+		params = {}
+		if amount:
+		    params = {"amount": int(amount * 100)}
 
-		captured_charge = self.api_retrieve().capture()
+		captured_charge = self.api_retrieve().capture(**params)
 		return self.__class__.sync_from_stripe_data(captured_charge)
 
 	@classmethod
